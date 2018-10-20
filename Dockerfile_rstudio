@@ -1,0 +1,47 @@
+
+FROM rocker/rstudio
+
+EXPOSE 8787
+
+RUN \
+  apt-get update -qq && apt-get -y --no-install-recommends install \
+  libxml2-dev \
+  libcairo2-dev \
+  libsqlite-dev \
+  libmariadbd-dev \
+  libmariadb-client-lgpl-dev \
+  libpq-dev \
+  libssh2-1-dev \
+  git \
+  python-pip \
+  python-dev \
+  net-tools && \
+  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN \
+  install2.r --error \
+    --deps TRUE \
+    tidyverse \
+    dplyr \
+    devtools \
+    formatR \
+    remotes \
+    selectr \
+    BiocManager \
+    RPostgreSQL \
+    reticulate
+
+RUN \
+  pip install -U pandas \
+  requests \
+  psycopg2 \
+  pytest \
+  virtualenv
+
+RUN \
+  pip install tensorflow
+
+RUN \
+  R -e "devtools::install_github('rstudio/keras'); library(keras); install_keras();"
+
+CMD ["/init"]
